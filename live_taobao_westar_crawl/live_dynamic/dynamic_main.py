@@ -20,6 +20,23 @@ def get_rows():
         if row:
             yield row
 
+def multiprocess_task(new_list):
+    pool = ThreadPool()
+    results = pool.map(spider_dynamic, new_list)
+    pool.close()
+    pool.join()
+    return results
+
+def insert_to_db(results):
+    for each_result in results:
+        try:
+            MYSQL_COON.insert_into_table(each_result, "live_taobao_webstar_crawl_live_dynamic")
+            #m = m + 1
+            #logging.info("-----------------" + str(m) + "\t:dynamic had been in mysql")
+        except Exception as e:
+            logging.error(str(each_result))
+            logging.error(e)
+
 def task_main():
 
     rows = get_rows()
@@ -36,37 +53,13 @@ def task_main():
         new_list.append(row["zhubo_id"])
 
         if n % 20 == 0:
-            pool = ThreadPool()
-            results = pool.map(spider_dynamic, new_list)
-            pool.close()
-            pool.join()
+            results = multiprocess_task(new_list)
             new_list = []
-            for each_result in results:
-                try:
-                    MYSQL_COON.insert_into_table(each_result, "live_taobao_webstar_crawl_live_dynamic")
-                    #m = m + 1
-                    #logging.info("-----------------" + str(m) + "\t:dynamic had been in mysql")
-                except Exception as e:
-                    logging.error(str(each_goods))
-                    logging.error(e)
-
-    pool = ThreadPool()
-    results = pool.map(spider_dynamic, new_list)
-    pool.close()
-    pool.join()
+            insert_to_db(results)
+    
+    results = multiprocess_task(new_list)
     new_list = []
-    for each_result in results:
-        try:
-            MYSQL_COON.insert_into_table(each_result, "live_taobao_webstar_crawl_live_dynamic")
-            #m = m + 1
-            #logging.info("-----------------" + str(m) + "\t:dynamic had been in mysql")
-        except Exception as e:
-            logging.error(str(each_goods))
-            logging.error(e)
-
-
-
-
+    insert_to_db(results)
 
 
 if __name__ == '__main__':
@@ -76,5 +69,5 @@ if __name__ == '__main__':
 
         task_main()
         logging.info("########################{} times of all live".format(n))
-        time.sleep(60)
+        time.sleep(120)
         n = n + 1

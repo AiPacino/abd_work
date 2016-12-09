@@ -30,7 +30,17 @@ class Downloader():
     def download_phantomjs(self, url):
         #phantomjs_path = r"C:\Python27\phantomjs-2.1.1-windows\bin\phantomjs.exe"
         #driver = webdriver.PhantomJS(executable_path=phantomjs_path, service_log_path=os.path.devnull)
+
         driver = webdriver.PhantomJS(service_log_path=os.path.devnull)
+
+        # if USE_PROXY:
+        #     proxy = webdriver.Proxy()
+        #     proxy.proxy_type = ProxyType.MANUAL
+        #     proxy.http_proxy = get_proxy()
+        #     proxy.add_to_capabilities(webdriver.DesiredCapabilities.PHANTOMJS)
+        # driver.start_session(webdriver.DesiredCapabilities.PHANTOMJS)
+
+
         driver.get(url)
         return driver
 
@@ -40,7 +50,7 @@ class Downloader():
         return driver
 
     def close_phantomjs(self, driver):
-        driver.close()
+        driver.quit()
 
     def download_requests(self, url):
         #A regular requests.get

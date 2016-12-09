@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 sys.path.append("..")
 from Downloader.Downloader import Downloader
-from Config.Config import LOW_HIGH_EQUAL, SHOP_SCORE
+from Config.Config import LOW_HIGH_EQUAL, TMALL_LOW_HITGH_EQUAL, SHOP_SCORE
 
 download = Downloader()
 
@@ -75,6 +75,19 @@ def get_detail(url):
     except Exception as e:
         logging.error(url)
         logging.error(e)
+
+    #tmall goods price
+    if detail.has_key("goods_price"):
+        pass
+    else:
+
+        try:
+            page_html = ''.join(html.split())
+            price = re.search(r'"defaultItemPrice":"(.*?)"', page_html).group(1)
+            detail["goods_price"] = price
+        except Exception as e:
+            logging.error(url)
+            logging.error(e)
     
 
     #shop rate
@@ -93,6 +106,24 @@ def get_detail(url):
         logging.error(url)
         logging.error(e)
 
+    #tmall shop rate
+    try:
+        rate_low_low_equal = soup.select(".shopdsr-item")
+
+        for each in rate_low_low_equal:
+            shop_title = each.select(".shopdsr-title")[0].get_text().strip()
+            shop_title = ''.join(shop_title.split())
+            shop_rate = each.select(".shopdsr-score-con")[0].get_text().strip()
+            detail[SHOP_SCORE[shop_title]] = shop_rate
+            for rate, select in TMALL_LOW_HITGH_EQUAL.items():
+                if each.select(select):
+                    title_rate = SHOP_SCORE[shop_title] + "_rate"
+                    detail[title_rate] = rate
+    except Exception as e:
+        logging.error(url)
+        logging.error(e)
+
+    print repr(detail).decode("unicode-escape")
     return detail
 
 def get_comment_summary(url):
@@ -153,10 +184,10 @@ def spider_goods(goods_id):
     }
 
     comment_count = get_comment_count(GOODS["comment_count"])
-    #loggind.error() comment_count
+    #logging.error() comment_count
 
     detail = get_detail(GOODS["detail"])
-    #loggind.error() detail
+    #logging.error() detail
 
     comment_summary = get_comment_summary(GOODS["comment_summary"])
     #rint comment_summary
@@ -176,7 +207,8 @@ def spider_goods(goods_id):
 if __name__ == '__main__':
     #goods_id = 540401358656
     logging.basicConfig(level=logging.INFO)
-    goods_id = 539421273992
+    #goods_id = 539421273992
+    goods_id = sys.argv[1]
     all_info = spider_goods(goods_id)
     print repr(all_info).decode("unicode-escape")
     # test()

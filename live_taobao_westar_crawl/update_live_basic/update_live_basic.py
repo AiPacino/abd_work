@@ -1,16 +1,18 @@
+
 #coding:utf-8
 import re
 import sys
 sys.path.append("..")
 from MySql_InterFace.mysql_interface import MYSQL
 from Downloader.Downloader import Downloader
+import logging
 
 MYSQL_COON = MYSQL()
 DOWNLOADER = Downloader()
 
 def update_live_from_zhubo_id(zhubo_id):
 
-    MYSQL_COON.update_live_basic_is_live(zhubo_id)
+    MYSQL_COON.update_live_basic_is_live_from_zhubo_id(zhubo_id)
 
 def update_live_from_live_id(live_id):
     MYSQL_COON.update_live_basic_is_live_from_live_id(live_id)
@@ -19,7 +21,12 @@ def get_live_id(zhubo_id):
     
     url = "https://taobaolive.taobao.com/room/index.htm?userId=" + str(zhubo_id)
     response = DOWNLOADER.download_requests(url)
-    live_id = re.search(r'"liveId":(\d+)', response.text).group(1)
+    try:
+        live_id = re.search(r'"liveId":(\d+)', response.text).group(1)
+    except Exception as e:
+        live_id = 0
+        logging.error(zhubo_id)
+        logging.error(e)
 
     return live_id
 

@@ -10,16 +10,10 @@ from MySql_InterFace.mysql_interface import MYSQL
 from Config.Config import USER_AGENTS
 from live_goods.live_goods import get_live_goods
 # from Config.Config import HEADERS
-#user_id = 291783866
-#user_id = 791105148
-#user_id = 652836700
-#user_id = 440050885
-user_ids = [2805352373, 2982693897, 1063569743, 369453264, 1776349514, 59045427, 23134914, 728310618, 1792939803, 2037233234]
 
+user_ids = [1026299578,]
 
 SESSION = requests.Session()
-
-MYSQL_COON = MYSQL()
 
 def get_info(url_info):
     
@@ -49,7 +43,9 @@ def get_goods_list(url_goods_list, live_id):
     return goods_json_dict
 
 
-def main(user_id):
+def spider_basic(user_id):
+
+    MYSQL_COON = MYSQL()
 
     url_info = "https://taobaolive.taobao.com/api/broadcaster_info/1.0?accountId={}".format(user_id)
     url_goods_list = "https://taobaolive.taobao.com/api/item_list/1.0?type=0&liveId="
@@ -94,6 +90,7 @@ def main(user_id):
 
     #response = SESSION.get(url_info)
     #print response.text
+    print repr(live_basic_info).decode("unicode-escape")
     MYSQL_COON.insert_into_table(live_basic_info, "live_taobao_webstar_crawl_live_basic")
 
 
@@ -104,7 +101,7 @@ if __name__ == '__main__':
     n = 1
     for user_id in user_ids:
         if n < 20:
-            main(user_id)
+            spider_basic(user_id)
         else:
             pass
         n = n + 1

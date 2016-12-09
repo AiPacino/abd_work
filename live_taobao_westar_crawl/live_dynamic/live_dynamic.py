@@ -44,8 +44,13 @@ def get_live_id(response):
 
 def spider_dynamic(zhubo_id):
     url = "https://taobaolive.taobao.com/room/index.htm?userId=" + str(zhubo_id)
-
-    response = DOWNLOADER.download_requests(url)
+    try:
+        response = DOWNLOADER.download_requests(url)
+    except Exception as e:
+        logging.error(zhubo_id)
+        logging.error(e)
+        return None
+    
     
     watching_dict = get_total_join_count(response)
     attention_dict = get_attention(response)

@@ -64,10 +64,12 @@ MYSQL_CONFIG = {
     "host": "localhost",
     "port": 3306,
     "user": "root",
-    "passwd": "zjy6030371",
+    "passwd": "123456",
     "db": "mydb",
     "charset": "utf8",
 }
+
+USE_MYSQL = True
 
 
 '''
@@ -77,7 +79,7 @@ zhubo_goods config
 '''
 #----------------------------------
 #use proxy or not
-USE_PROXY = False
+USE_PROXY = True
 
 #headers
 HEADERS = {
@@ -101,6 +103,13 @@ LOW_HIGH_EQUAL = {
     "1":".tb-rate-higher",
     "0":".tb-rate-equal",
 }
+#tmall shop score's rate(low, equal, high)
+TMALL_LOW_HITGH_EQUAL = {
+     "-1":".shopdsr-score-down",
+    "1":".shopdsr-score-up",
+    "0":".shopdsr-score-equal",
+}
+
 
 #a special headers for the sell and count
 SELL_COUNT_HEADERS = {
@@ -143,3 +152,31 @@ INFO_MAP = {
     u"认证信息":"zhubo_authen_infor",
     u"个人简介":"zhubo_profile",
 }
+
+#zhubo live page for danmu
+DANMU = {
+    u"进入了直播间":"0",
+    u"正在去购买的路上":"1",
+    u"关注了主播":"2",
+    #"":u"3", the rest is the comment
+}
+
+'''
+#########################################################################
+TASK_ORIGIN
+#########################################################################
+'''
+#how many thread to start the task
+THREAD_NUM = 20
+
+#table begin name
+TABLE_BEGIN = "live_taobao_webstar_crawl_"
+
+#table_name
+GOODS_INFO_TABLE = TABLE_BEGIN + "goods_info"
+LIVE_BASIC_TABLE = TABLE_BEGIN + "live_basic"
+LIVE_DANMU_TABLE = TABLE_BEGIN + "live_danmu"
+LIVE_DYNAMIC_TABLE = TABLE_BEGIN + "live_dynamic"
+LIVE_GOODS_TABLE = TABLE_BEGIN + "live_goods"
+ZHUBO_INFO_TABLE = TABLE_BEGIN + "zhubo_info"
+
