@@ -44,4 +44,5 @@ def get_update_state(row):
 
 
 if __name__ == '__main__':
-    update()
+    zhubo_id = sys.argv[1]
+    print get_live_id(zhubo_id)

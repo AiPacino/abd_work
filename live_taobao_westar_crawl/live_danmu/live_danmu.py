@@ -8,10 +8,11 @@ import copy
 import re
 from collections import defaultdict
 from MySql_InterFace.mysql_interface import MYSQL
-from update_live_basic.update_live_basic import get_update_state
+from update_live_basic.update_live_basic import get_update_state, get_live_id
 import logging
 from datetime import datetime
 from pyvirtualdisplay import Display
+import time
 
 DOWNLOAD = Downloader()
 #MYSQL_COON = MYSQL()
@@ -57,11 +58,13 @@ def process_comment_list(comment_list, live_id):
 def spider_danmu(zhubo_id):
 
     before_comments = []
+    whether_stuck = 0
     url = "https://taobaolive.taobao.com/room/index.htm?userId={}".format(zhubo_id)
-    driver = DOWNLOAD.download_chrome(url)
 
     display = Display(visible=0, size=(800,800))
     display.start()
+
+    driver = DOWNLOAD.download_chrome(url)
     #get live id
     response = DOWNLOAD.download_requests(url)
     try:
@@ -71,34 +74,49 @@ def spider_danmu(zhubo_id):
         logging.error(url)
         logging.error(e)
 
-    comment_outer = DOWNLOAD.find_element_by_css(driver, ".comment-inner")
+    while True:
 
-    while comment_outer:
+        # try:
+        #     live_done = driver.find_element_by_css_selector(".lr-video-err-mask")
+        # except Exception as e:
+        #     if live_id == 0:
+        #         driver.quit()
+        #         break
+        #live_id = get_live_id(zhubo_id)
         try:
-            live_done = driver.find_element_by_css_selector(".lr-video-err-mask")
-        except Exception as e:
-            if live_id == 0:
-                driver.close()
+            if str(0) != get_live_id(zhubo_id) == live_id:
+                comment_outer = DOWNLOAD.find_element_by_css(driver, ".comment-inner")
+                comment_text = re.sub(r":\n", " ", comment_outer.text)
+                all_comments = comment_text.splitlines()
+
+                cha_set_list = get_cha_list(all_comments, before_comments)
+
+                if cha_set_list:
+                    whether_stuck = 0
+                    process_comment_list(cha_set_list, live_id)
+                else:
+                    whether_stuck += 1
+                    if whether_stuck >= 10:
+                        logging.info("danmu is refreshing!")
+                        driver.refresh()
+                    #print repr(cha_set_list).decode("unicode-escape")
+                before_comments = copy.deepcopy(all_comments)
+                time.sleep(1)
+            else:
                 break
-            comment_text = re.sub(r":\n", " ", comment_outer.text)
-            all_comments = comment_text.splitlines()
+        except Exception as e:
+            logging.error("something wrong in the living danmu!")
+            logging.error(e)
+            try:
+                driver.refresh()
+            except Exception as e:
+                logging.error(e)
+                #driver.quit()
+                driver = DOWNLOAD.download_chrome(url)
+            
 
-            cha_set_list = get_cha_list(all_comments, before_comments)
-
-            if cha_set_list:
-                process_comment_list(cha_set_list, live_id)
-                #print repr(cha_set_list).decode("unicode-escape")
-            before_comments = copy.deepcopy(all_comments)
-        else:
-            driver.close()
-            break
-        #print live_done
-
-
-
-        
-        
-    logging.info("This {} didn't living!".format(zhubo_id))
+    driver.quit()
+    logging.info("Zhubo {} is not living".format(zhubo_id))
 
 
 if __name__ == '__main__':

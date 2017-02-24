@@ -7,33 +7,38 @@ from MySql_InterFace.mysql_interface import MYSQL
 from Downloader.Downloader import Downloader
 from Config.Config import ZHUBO_CSS, TITLE_DESC, INFO_MAP
 import json
+from pyvirtualdisplay import Display
 
-MySQL_COON = MYSQL()
-download = Downloader()
+#MySQL_COON = MYSQL()
+
 
 def get_zhubo_url(zhubo_id):
 
     #zhubo_id = "http:" + zhubo_id
-    user_info_json = json.loads(zhubo_id)
-    zhubo_url = user_info_json["result"]["model"]["broadCaster"]["jumpUrl"]
-    zhubo_url = "http:" + zhubo_url
+    zhubo_url = "http://h5.m.taobao.com/daren/home.html?userId=" + str(zhubo_id)
+    
     return zhubo_url
 
 def spider_zhubo(zhubo_id):
     
     zhubo_info_dict = {}
+
+    download = Downloader()
+
     zhubo_url = get_zhubo_url(zhubo_id)
 
     try:
         zhubo_id = re.search(r"userId=(\d+)", zhubo_url).group(1)
     except Exception as e:
-        zhubo_id = -1
+        zhubo_id = 0
         logging.error(zhubo_url)
         logging.error(e)
     zhubo_info_dict["zhubo_id"] = zhubo_id
 
+    # display = Display(visible=0, size=(800,800))
+    # display.start()
     #get the driver
-    driver = download.download_chrome(zhubo_url)
+    driver = download.download_phantomjs(zhubo_url)
 
     #get daren url
     daren_url = download.find_element_by_css(driver, ZHUBO_CSS["daren_url"])
@@ -54,8 +59,10 @@ def spider_zhubo(zhubo_id):
     
     driver.quit()
 
+    # display = Display(visible=0, size=(800,800))
+    # display.start()
     #spider in the homepage of zhubo
-    driver_info = download.download_chrome(daren_url)
+    driver_info = download.download_phantomjs(daren_url)
     contents = download.find_elements_by_css(driver_info, ZHUBO_CSS["daren_all_info"])
 
     if contents:
@@ -67,7 +74,7 @@ def spider_zhubo(zhubo_id):
                 zhubo_info_dict[INFO_MAP[title.text]] = desc.text
 
     driver_info.quit()
-    print repr(zhubo_info_dict).decode("unicode-escape")
+    #print repr(zhubo_info_dict).decode("unicode-escape")
     # MySQL_COON.insert_into_table(zhubo_info_dict, "daren_info")
     # MySQL_COON.close_db()
     return zhubo_info_dict

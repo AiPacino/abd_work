@@ -3,6 +3,7 @@ import json
 import sys
 sys.path.append("..")
 from MySql_InterFace.mysql_interface import MYSQL
+import logging
 
 MySQL_COON = MYSQL()
 
@@ -28,7 +29,7 @@ def get_live_goods(goods_json, live_id):
         live_goods["goods_id"] = each["itemId"]
         live_goods["goods_title"] = each["itemName"]
         #print repr(live_goods).decode("unicode-escape")
-        print n
+        logging.info("Spider {} item into live_goods".format(n))
         MySQL_COON.insert_into_table(live_goods, "live_taobao_webstar_crawl_live_goods")
         n = n + 1
 

@@ -15,7 +15,7 @@ def start_zhubo_info_task():
         "which_module": spider_zhubo,
         "into_table": into_table,
         "need_to_return": True,
-        "which_need_in_row": "user_info_json",
+        "which_need_in_row": "zhubo_id",
         "update_into_table": True
     }
     zhubo_info_task = TASK_OBJECT(**param)

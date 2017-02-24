@@ -1,18 +1,27 @@
 #coding:utf-8
 #config file for the zhubo_goods
 import logging
+from logging.handlers import TimedRotatingFileHandler
 import random
 
 #logging config
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
-                filename='log.log',
+                filename='log',
                 filemode='w')
+
+#hdlr = logging.handlers.TimedRotatingFileHandler(LOG_FILE,when='M',interval=1,backupCount=40)
+filehandler = logging.handlers.TimedRotatingFileHandler("log", 'D', 1, 0)
+filehandler.suffix = "%Y%m%d.log"
+
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
+#console.TimedRotatingFIleHandle(LOG_FILE,when='D',interval=1,backupCount=40)
 logging.getLogger('').addHandler(console)
+logging.getLogger('').addHandler(filehandler)
 
 
 '''
@@ -167,7 +176,7 @@ TASK_ORIGIN
 #########################################################################
 '''
 #how many thread to start the task
-THREAD_NUM = 20
+THREAD_NUM = 10
 
 #table begin name
 TABLE_BEGIN = "live_taobao_webstar_crawl_"
@@ -178,5 +187,6 @@ LIVE_BASIC_TABLE = TABLE_BEGIN + "live_basic"
 LIVE_DANMU_TABLE = TABLE_BEGIN + "live_danmu"
 LIVE_DYNAMIC_TABLE = TABLE_BEGIN + "live_dynamic"
 LIVE_GOODS_TABLE = TABLE_BEGIN + "live_goods"
+LIVE_GOODS_TEMP_TABLE = TABLE_BEGIN + "live_goods_temp"
 ZHUBO_INFO_TABLE = TABLE_BEGIN + "zhubo_info"
-
+ZHUBO_LIVE_TABLE = TABLE_BEGIN + "zhubo_live"

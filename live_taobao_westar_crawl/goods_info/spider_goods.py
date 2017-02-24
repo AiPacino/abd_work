@@ -15,17 +15,17 @@ download = Downloader()
 def translate_jsonp_json(jsonp):
     jsonp = jsonp.strip()
     if jsonp.endswith(")"):
-        logging.info("endswith )")
+        #logging.info("endswith )")
         data_json = jsonp.strip("jsonp(").strip(")")
         data_json = json.loads(data_json)
         return data_json
     elif jsonp.endswith(");"):
-        logging.info("endswith );")
+        #logging.info("endswith );")
         data_json = jsonp.strip("jsonp(").strip(");")
         data_json = json.loads(data_json)
         return data_json
     else:
-        logging.info("endswith unknown")
+        logging.info("goods json endswith unknown")
         data_json = json.laods(jsonp)
         return data_json
 
@@ -122,8 +122,8 @@ def get_detail(url):
     except Exception as e:
         logging.error(url)
         logging.error(e)
-
-    print repr(detail).decode("unicode-escape")
+    #logging.debug(repr(detail).decode("unicode-escape"))
+    #print repr(detail).decode("unicode-escape")
     return detail
 
 def get_comment_summary(url):
@@ -206,7 +206,7 @@ def spider_goods(goods_id):
 
 if __name__ == '__main__':
     #goods_id = 540401358656
-    logging.basicConfig(level=logging.INFO)
+    #logging.basicConfig(level=logging.INFO)
     #goods_id = 539421273992
     goods_id = sys.argv[1]
     all_info = spider_goods(goods_id)

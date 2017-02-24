@@ -55,13 +55,16 @@ def spider_dynamic(zhubo_id):
     watching_dict = get_total_join_count(response)
     attention_dict = get_attention(response)
     live_id_dict = get_live_id(response)
+    if live_id_dict["live_id"] != str(0):
 
-    watch_atten_dict = dict(watching_dict, **attention_dict)
+        watch_atten_dict = dict(watching_dict, **attention_dict)
 
-    dynamic_dict = dict(watch_atten_dict, **live_id_dict)
-    dynamic_dict["crawl_time"] = datetime.now()
+        dynamic_dict = dict(watch_atten_dict, **live_id_dict)
+        dynamic_dict["crawl_time"] = datetime.now()
 
-    return dynamic_dict
+        return dynamic_dict
+    else:
+        return None
 
 
 

@@ -40,7 +40,7 @@ class TASK_OBJECT(object):
                 yield row
 
     def multiprocess_task(self,new_list):
-        pool = ThreadPool()
+        pool = ThreadPool(THREAD_NUM)
         if self.need_to_return:
             results = pool.map(self.which_module, new_list)
         else:
